@@ -13,7 +13,7 @@ import {ExpenseList} from 'components';
 
 const App: () => React$Node = () => (
   <>
-    <StatusBar barStyle="dark-content" />
+    <StatusBar backgroundColor="#BE4552" barStyle="light-content" />
     <ExpenseList />
   </>
 );

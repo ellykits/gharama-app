@@ -1,15 +1,32 @@
 import React, {Component} from 'react';
+import {Navigation} from 'react-native-navigation';
 import moment from 'moment';
 import {
-  StyleSheet,
-  FlatList,
-  Text,
-  View,
   ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default class ExpenseList extends Component {
+  static get options() {
+    return {
+      topBar: {
+        title: {
+          text: 'Expenses',
+          color: 'white',
+          fontWeight: 'bold',
+        },
+        background: {
+          color: '#ED5666',
+          translucent: false,
+        },
+      },
+    };
+  }
+
   constructor(props) {
     super(props);
     this.state = {expenses: [], isLoading: true};
@@ -32,9 +49,7 @@ export default class ExpenseList extends Component {
       .catch(error => console.log(error));
   }
 
-  FlatListItemSeparator = () => {
-    return <View style={styles.itemSeparator} />;
-  };
+  FlatListItemSeparator = () => <View style={styles.itemSeparator} />;
 
   _bindItem(data) {
     return (
@@ -65,7 +80,27 @@ export default class ExpenseList extends Component {
     );
   }
 
-  _onPress(item) {}
+  _onPress(item) {
+    const {first, last} = item.user;
+    let {merchant} = item;
+    let pageTitle = `${first.toString()} ${last.toString()} (${merchant.toLowerCase()})`;
+
+    Navigation.push(this.props.componentId, {
+      component: {
+        name: 'ExpenseDetails',
+        passProps: {
+          expense: item,
+        },
+        options: {
+          topBar: {
+            title: {
+              text: pageTitle,
+            },
+          },
+        },
+      },
+    });
+  }
 
   render() {
     if (this.state.isLoading) {
