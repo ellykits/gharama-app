@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import moment from 'moment';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 export default class ExpenseDetails extends Component {
   static get options() {
@@ -98,7 +99,7 @@ export default class ExpenseDetails extends Component {
               {
                 <TouchableOpacity onPress={this._postComment()}>
                   <View>
-                    <Text style={styles.post_button_text}>CAM</Text>
+                    <Icon name="photo-camera" size={30} color="#ED5666" />
                   </View>
                 </TouchableOpacity>
               }
@@ -106,10 +107,8 @@ export default class ExpenseDetails extends Component {
             <TextInput
               style={styles.text_field}
               multiline={true}
-              onChangeText={this.props.expense.category}
               placeholder="Type your comment here..."
             />
-
             <View style={styles.button_container}>
               {
                 <TouchableOpacity onPress={this._postComment()}>
@@ -184,17 +183,17 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     alignItems: 'flex-start',
   },
-  text_field: {
-    height: 40,
-    flex: 8,
-  },
   button_container: {
     flex: 2,
     alignSelf: 'center',
     alignItems: 'flex-end',
   },
+  text_field: {
+    height: 40,
+    flex: 8,
+  },
   post_button_text: {
-    color: '#BE4552',
+    color: '#ED5666',
     fontWeight: 'bold',
     fontSize: 16,
   },
