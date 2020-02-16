@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Navigation} from 'react-native-navigation';
+import {ItemSeparator} from 'components';
 import moment from 'moment';
 import {
   ActivityIndicator,
@@ -13,9 +14,13 @@ import {
 export default class ExpenseList extends Component {
   static get options() {
     return {
+      statusBar: {
+        visible: true,
+        style: 'light',
+      },
       topBar: {
         title: {
-          text: 'Expenses',
+          text: 'EXPENSES',
           color: 'white',
           fontWeight: 'bold',
         },
@@ -39,7 +44,7 @@ export default class ExpenseList extends Component {
   }
 
   _getExpenses() {
-    fetch('http://10.0.2.2:3000/expenses', {method: 'GET'})
+    fetch('http://192.168.88.236:3000/expenses', {method: 'GET'})
       .then(response => response.json())
       .then(jsonResponse => {
         let list = jsonResponse.expenses;
@@ -48,8 +53,6 @@ export default class ExpenseList extends Component {
       })
       .catch(error => console.log(error));
   }
-
-  FlatListItemSeparator = () => <View style={styles.itemSeparator} />;
 
   _bindItem(data) {
     return (
@@ -63,7 +66,7 @@ export default class ExpenseList extends Component {
               {data.item.amount.currency} {data.item.amount.value}
             </Text>
           </View>
-          <Text style={styles.item}>
+          <Text style={[styles.itemRow, styles.item]}>
             {data.item.category !== '' ? data.item.category : 'Uncategorized'}{' '}
             {moment().format('YYYY-MM-DD', data.item.date)}
           </Text>
@@ -71,7 +74,7 @@ export default class ExpenseList extends Component {
             <Text style={styles.item}>
               Expense for {data.item.user.first} {data.item.user.last}
             </Text>
-            <Text style={styles.itemEnd}>
+            <Text style={[styles.itemEnd, styles.comment]}>
               {data.item.category === '' ? '(No comment)' : 'Comment (1)'}
             </Text>
           </View>
@@ -81,9 +84,8 @@ export default class ExpenseList extends Component {
   }
 
   _onPress(item) {
-    const {first, last} = item.user;
     let {merchant} = item;
-    let pageTitle = `${first.toString()} ${last.toString()} (${merchant.toLowerCase()})`;
+    let pageTitle = `${merchant.toUpperCase()} EXPENSE`;
 
     Navigation.push(this.props.componentId, {
       component: {
@@ -113,7 +115,7 @@ export default class ExpenseList extends Component {
     return (
       <View view={styles.container}>
         <FlatList
-          ItemSeparatorComponent={this.FlatListItemSeparator}
+          ItemSeparatorComponent={ItemSeparator}
           data={this.state.expenses}
           renderItem={item => this._bindItem(item)}
           keyExtractor={item => item.id.toString()}
@@ -125,12 +127,14 @@ export default class ExpenseList extends Component {
 
 const styles = StyleSheet.create({
   itemWrapper: {
+    flex: 1,
+    flexDirection: 'column',
     backgroundColor: 'white',
-    marginVertical: 8,
+    marginVertical: 2,
     marginStart: 0,
     marginEnd: 8,
     borderLeftWidth: 8,
-    borderLeftColor: '#66BB6A',
+    borderLeftColor: '#63CCF2',
   },
   item: {
     fontSize: 14,
@@ -140,10 +144,9 @@ const styles = StyleSheet.create({
   itemSeparator: {
     height: 1,
     width: '100%',
-    backgroundColor: '#ccc',
+    backgroundColor: '#c7c7c7',
   },
   itemRow: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -179,5 +182,8 @@ const styles = StyleSheet.create({
     color: '#696969',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  comment: {
+    color: '#696969',
   },
 });

@@ -7,15 +7,14 @@
  */
 
 import React from 'react';
-import {StatusBar} from 'react-native';
+import {View} from 'react-native';
 
 import {ExpenseList} from 'components';
 
 const App: () => React$Node = () => (
-  <>
-    <StatusBar backgroundColor="#BE4552" barStyle="light-content" />
+  <View>
     <ExpenseList />
-  </>
+  </View>
 );
 
 export default App;
