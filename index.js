@@ -11,7 +11,19 @@ import {registerScreens} from 'navigation/navigation';
 AppRegistry.registerComponent(appName, () => App);
 
 registerScreens();
-
+Navigation.setDefaultOptions({
+  animations: {
+    push: {
+      enabled: false,
+    },
+    pop: {
+      enabled: false,
+    },
+    setRoot: {
+      enabled: false,
+    },
+  },
+});
 Navigation.events().registerAppLaunchedListener(() => {
   Navigation.setRoot({
     root: {

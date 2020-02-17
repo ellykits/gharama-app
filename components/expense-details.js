@@ -45,7 +45,11 @@ export default class ExpenseDetails extends Component {
   _postComment() {}
 
   _addReceipt() {
-    NativeImagePicker.pickImage();
+    NativeImagePicker.pickImage()
+      .then(filePath => {
+        console.log(`Uploaded image path => ${filePath}`);
+      })
+      .catch(error => console.log(error));
   }
 
   render() {
