@@ -24,6 +24,7 @@ export default class ExpenseList extends Component {
           color: 'white',
           fontWeight: 'bold',
         },
+        animate: false,
         background: {
           color: '#ED5666',
           translucent: false,
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
   loader: {
     flex: 1,

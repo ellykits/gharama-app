@@ -1,4 +1,6 @@
 apply plugin: "com.android.application"
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 import com.android.build.OutputFile
 
@@ -82,6 +84,10 @@ project.ext.react = [
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
+
+project.ext.vectoricons = [
+        iconFontNames: [ 'MaterialIcons.ttf', 'FontAwesome.ttf' ]
+]
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 /**
@@ -188,9 +194,12 @@ android {
 
 dependencies {
     implementation project(':react-native-vector-icons')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
     implementation project(':react-native-navigation')
+    implementation project(':native-android-modules')
 
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/"

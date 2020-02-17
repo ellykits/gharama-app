@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import NativeImagePicker from '../modules/NativeImagePicker';
 
 export default class ExpenseDetails extends Component {
   static get options() {
@@ -25,6 +26,7 @@ export default class ExpenseDetails extends Component {
           leftButtonColor: 'white',
           rightButtonColor: 'white',
         },
+        animate: false,
         background: {
           color: '#ED5666',
           translucent: false,
@@ -41,6 +43,10 @@ export default class ExpenseDetails extends Component {
   }
 
   _postComment() {}
+
+  _addReceipt() {
+    NativeImagePicker.pickImage();
+  }
 
   render() {
     return (
@@ -97,7 +103,7 @@ export default class ExpenseDetails extends Component {
           <View style={styles.comment_box}>
             <View style={styles.cam_container}>
               {
-                <TouchableOpacity onPress={this._postComment()}>
+                <TouchableOpacity onPress={() => this._addReceipt()}>
                   <View>
                     <Icon name="photo-camera" size={30} color="#ED5666" />
                   </View>
@@ -111,7 +117,7 @@ export default class ExpenseDetails extends Component {
             />
             <View style={styles.button_container}>
               {
-                <TouchableOpacity onPress={this._postComment()}>
+                <TouchableOpacity onPress={() => this._postComment()}>
                   <View>
                     <Text style={styles.post_button_text}>POST</Text>
                   </View>

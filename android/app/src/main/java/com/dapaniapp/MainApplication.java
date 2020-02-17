@@ -2,6 +2,7 @@ package com.dapaniapp;
 
 import android.content.Context;
 
+import com.dapaniapp.nativemodules.imagepicker.ImagePickerPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -61,10 +62,9 @@ public class MainApplication extends NavigationApplication implements ReactAppli
     }
 
     protected List<ReactPackage> getPackages() {
-        // Add additional packages you require here
-        // No need to add RnnPackage and MainReactPackage
-        // eg. new VectorIconsPackage()
-        return Collections.emptyList();
+        List<ReactPackage> packages = new PackageList(this).getPackages();
+        packages.add(new ImagePickerPackage());
+        return packages;
     }
 
     @Override
