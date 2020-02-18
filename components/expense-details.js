@@ -11,6 +11,7 @@ import {
 import moment from 'moment';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import NativeImagePicker from '../modules/NativeImagePicker';
+import ExpenseService from 'services/expense-service';
 
 export default class ExpenseDetails extends Component {
   static get options() {
@@ -40,9 +41,17 @@ export default class ExpenseDetails extends Component {
 
   constructor(props) {
     super(props);
+    this.state = {
+      expense: this.props.expense,
+      comment: this.props.expense.comment,
+    };
   }
 
-  _postComment() {}
+  _postComment() {
+    ExpenseService.prototype.postComment(this.props.expense.id, {
+      comment: this.state.comment,
+    });
+  }
 
   _addReceipt() {
     NativeImagePicker.pickImage()
@@ -97,9 +106,9 @@ export default class ExpenseDetails extends Component {
             </View>
             <Text style={styles.header}>Comment</Text>
             <Text style={styles.comment}>
-              {this.props.expense.category === ''
+              {this.props.expense.comment === ''
                 ? 'No comment'
-                : this.props.expense.category}
+                : this.props.expense.comment}
             </Text>
             <Text style={styles.header}>Receipts</Text>
           </ScrollView>
@@ -117,6 +126,8 @@ export default class ExpenseDetails extends Component {
             <TextInput
               style={styles.text_field}
               multiline={true}
+              onChangeText={comment => this.setState({comment})}
+              value={this.state.comment}
               placeholder="Type your comment here..."
             />
             <View style={styles.button_container}>
@@ -199,7 +210,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   text_field: {
-    height: 40,
+    height: 60,
     flex: 8,
   },
   post_button_text: {

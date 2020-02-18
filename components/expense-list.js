@@ -48,8 +48,6 @@ export default class ExpenseList extends Component {
     fetch('http://192.168.88.236:3000/expenses', {method: 'GET'})
       .then(response => response.json())
       .then(jsonResponse => {
-        let list = jsonResponse.expenses;
-        list.sort((a, b) => (a.merchant > b.merchant ? 1 : -1));
         this.setState({expenses: jsonResponse.expenses, isLoading: false});
       })
       .catch(error => console.log(error));
