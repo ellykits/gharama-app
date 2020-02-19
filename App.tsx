@@ -6,12 +6,11 @@
  * @flow
  */
 
-import React from 'react';
+import React, {ReactNode} from 'react';
 import {View} from 'react-native';
+import ExpenseList from "./screens/expense-list";
 
-import {ExpenseList} from 'components';
-
-const App: () => React$Node = () => (
+const App: () => ReactNode = () => (
   <View>
     <ExpenseList />
   </View>
