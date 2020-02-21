@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import ItemSeparator from "../components/item-separator";
 import {Expense} from "../common/common-types";
+import ExpenseService from "../services/expense-service";
 
 interface Props {
     componentId: string;
@@ -43,22 +44,17 @@ export default class ExpenseList extends Component<Props, State> {
         };
     }
 
+    expenseService = new ExpenseService();
+
     constructor(props: Props) {
         super(props);
         this.state = {expenses: [], isLoading: true};
     }
 
     componentDidMount() {
-        if (this.state.expenses.length === 0) {
-            this._getExpenses();
-        }
-    }
-
-    _getExpenses() {
-        fetch('http://192.168.88.236:3000/expenses', {method: 'GET'})
-            .then(response => response.json())
-            .then(jsonResponse => {
-                this.setState({expenses: jsonResponse.expenses, isLoading: false});
+        this.expenseService.getExpenses()
+            .then(expenses => {
+                this.setState({expenses: expenses, isLoading: false});
             })
             .catch(error => console.log(error));
     }
