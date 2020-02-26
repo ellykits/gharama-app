@@ -1,5 +1,5 @@
 /**
- * Sample React Native App
+ * Dapani app
  * https://github.com/facebook/react-native
  *
  * @format
@@ -12,7 +12,7 @@ import ExpenseList from "./screens/expense-list";
 
 const App: () => ReactNode = () => (
   <View>
-    <ExpenseList />
+    <ExpenseList componentId={"Expense"}/>
   </View>
 );
 

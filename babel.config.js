@@ -9,6 +9,7 @@ module.exports = {
             "extensions": [".js", ".ts", ".tsx", ".ios.js", ".android.js"]
         }],
         "@babel/plugin-transform-runtime",
+        ["@babel/plugin-proposal-decorators", { "legacy": true }]
     ],
     "env": {
         "production": {

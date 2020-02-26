@@ -5,16 +5,15 @@ import android.content.Context;
 import com.dapaniapp.nativemodules.imagepicker.ImagePickerPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.nozbe.watermelondb.WatermelonDBPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.react.NavigationReactNativeHost;
 import com.reactnativenavigation.react.ReactGateway;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.List;
 
 public class MainApplication extends NavigationApplication implements ReactApplication {
@@ -64,6 +63,7 @@ public class MainApplication extends NavigationApplication implements ReactAppli
     protected List<ReactPackage> getPackages() {
         List<ReactPackage> packages = new PackageList(this).getPackages();
         packages.add(new ImagePickerPackage());
+        packages.add( new WatermelonDBPackage());
         return packages;
     }
 

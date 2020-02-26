@@ -11,18 +11,34 @@ import {
 } from 'react-native';
 import ItemSeparator from "../components/item-separator";
 import {Expense} from "../common/common-types";
+import {connect} from "react-redux";
 import ExpenseService from "../services/expense-service";
+import {AppState, store} from "../store";
+
 
 interface Props {
     componentId: string;
+    expenses: Expense[]
+    isLoading: boolean
 }
 
-interface State {
-    expenses: Expense[];
-    isLoading: boolean;
-}
+class ExpenseList extends Component<Props> {
 
-export default class ExpenseList extends Component<Props, State> {
+    private expenseService = new ExpenseService();
+
+    constructor(props: Props) {
+        super(props);
+    }
+
+    componentDidMount(): void {
+        this.expenseService.fetchExpenses()
+            .then(expenses => {
+                this.expenseService.dispatchSaveExpenses(expenses)
+                console.log(store.getState())
+            })
+            .catch(error => console.log(error));
+    }
+
     static get options() {
         return {
             statusBar: {
@@ -42,21 +58,6 @@ export default class ExpenseList extends Component<Props, State> {
                 },
             },
         };
-    }
-
-    expenseService = new ExpenseService();
-
-    constructor(props: Props) {
-        super(props);
-        this.state = {expenses: [], isLoading: true};
-    }
-
-    componentDidMount() {
-        this.expenseService.getExpenses()
-            .then(expenses => {
-                this.setState({expenses: expenses, isLoading: false});
-            })
-            .catch(error => console.log(error));
     }
 
     _bindItem(data: Expense) {
@@ -110,7 +111,8 @@ export default class ExpenseList extends Component<Props, State> {
     }
 
     render() {
-        if (this.state.isLoading) {
+        console.log(store.getState());
+        if (this.props.isLoading) {
             return (
                 <View style={styles.loader}>
                     <ActivityIndicator size="large" color="#0c9"/>
@@ -121,7 +123,7 @@ export default class ExpenseList extends Component<Props, State> {
             <View style={styles.container}>
                 <FlatList
                     ItemSeparatorComponent={ItemSeparator}
-                    data={this.state.expenses}
+                    data={this.props.expenses}
                     renderItem={data => this._bindItem(data.item)}
                     keyExtractor={item => item.id.toString()}
                 />
@@ -192,3 +194,11 @@ const styles = StyleSheet.create({
         color: '#696969',
     },
 });
+
+
+const mapStateToProps = (appState: AppState) => {
+    console.log('Calling mapstatetoprops');
+    return {expenses: appState.expenseState.expenses, isLoading: appState.expenseState.isLoading}
+};
+
+export default connect(mapStateToProps)(ExpenseList)
