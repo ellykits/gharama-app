@@ -7,7 +7,7 @@ const expenseDefaultState: ExpenseState = {
 
 const expenseReducer = (state = expenseDefaultState, action: ExpenseActions): ExpenseState => {
     if (action.type === "SAVE_EXPENSES") {
-        return Object.assign({}, state, {expenses: state.expenses.concat(action.payload), isLoading: false});
+        return Object.assign({}, {}, {expenses: action.payload, isLoading: false});
     }
     return state;
 };

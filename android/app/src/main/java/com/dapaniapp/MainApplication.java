@@ -2,13 +2,14 @@ package com.dapaniapp;
 
 import android.content.Context;
 
-import com.dapaniapp.nativemodules.imagepicker.ImagePickerPackage;
+import com.dapaniapp.screens.expense.ExpenseDetailsPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
+import com.facebook.react.bridge.ReactApplicationContext;
+import com.facebook.react.modules.appstate.AppStateModule;
 import com.facebook.soloader.SoLoader;
-import com.nozbe.watermelondb.WatermelonDBPackage;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.react.NavigationReactNativeHost;
 import com.reactnativenavigation.react.ReactGateway;
@@ -62,8 +63,7 @@ public class MainApplication extends NavigationApplication implements ReactAppli
 
     protected List<ReactPackage> getPackages() {
         List<ReactPackage> packages = new PackageList(this).getPackages();
-        packages.add(new ImagePickerPackage());
-        packages.add( new WatermelonDBPackage());
+        packages.add(new ExpenseDetailsPackage());
         return packages;
     }
 

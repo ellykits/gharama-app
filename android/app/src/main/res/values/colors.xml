@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_primary">#F06292</color>
+    <color name="color_primary_dark">#ba2d65</color>
+    <color name="color_accent">#42A5F5</color>
+    <color name="light_grey">#FAFAFA</color>
+    <color name="grey_text">#696969</color>
+    <color name="hint_color">#999999</color>
+    <color name="pink">#EC008C</color>
+    <color name="black">#232F3F</color>
+    <color name="comment_section_background">#f4f5f6</color>
+    <color name="white">#ffffff</color>
+</resources>

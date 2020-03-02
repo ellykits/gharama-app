@@ -1,6 +1,5 @@
 rootProject.name = 'DapaniApp'
-include ':app', ':react-native-vector-icons', ':native-android-modules', ':react-native-navigation', ':watermelondb'
+include ':app', ':react-native-vector-icons', ':react-native-navigation'
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 project(':react-native-navigation').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-navigation/lib/android/app/')
 project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
-project(':watermelondb').projectDir = new File(rootProject.projectDir, '../node_modules/@nozbe/watermelondb/native/android')

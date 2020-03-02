@@ -11,8 +11,6 @@
     "lint-fix": "eslint . --fix"
   },
   "dependencies": {
-    "@nozbe/watermelondb": "^0.15.0",
-    "@nozbe/with-observables": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^2.20.0",
     "@typescript-eslint/parser": "^2.20.0",
     "eslint-import-resolver-typescript": "^2.0.0",

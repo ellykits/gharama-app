@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import {Navigation} from 'react-native-navigation';
-import moment from 'moment';
 import {
     ActivityIndicator,
     FlatList,
@@ -8,13 +6,15 @@ import {
     Text,
     TouchableOpacity,
     View,
+    NativeEventEmitter,
 } from 'react-native';
 import ItemSeparator from "../components/item-separator";
 import {Expense} from "../common/common-types";
 import {connect} from "react-redux";
 import ExpenseService from "../services/expense-service";
-import {AppState, store} from "../store";
-
+import {AppState} from "../store";
+import {NativeModules} from 'react-native';
+import moment from "moment";
 
 interface Props {
     componentId: string;
@@ -33,10 +33,16 @@ class ExpenseList extends Component<Props> {
     componentDidMount(): void {
         this.expenseService.fetchExpenses()
             .then(expenses => {
-                this.expenseService.dispatchSaveExpenses(expenses)
-                console.log(store.getState())
-            })
-            .catch(error => console.log(error));
+                this.expenseService.dispatchSaveExpenses(expenses);
+            }).catch(error => console.log(error));
+
+        const eventEmitter = new NativeEventEmitter(NativeModules.ExpenseDetailsModule);
+        eventEmitter.addListener('UploadImageEvent', (event) => {
+            console.log(event)
+        });
+        eventEmitter.addListener('PostCommentEvent', (event) => {
+            console.log(event)
+        });
     }
 
     static get options() {
@@ -44,16 +50,17 @@ class ExpenseList extends Component<Props> {
             statusBar: {
                 visible: true,
                 style: 'light',
+                backgroundColor: '#ba2d65'
             },
             topBar: {
                 title: {
-                    text: 'EXPENSES',
+                    text: 'Expenses',
                     color: 'white',
                     fontWeight: 'bold',
                 },
                 animate: false,
                 background: {
-                    color: '#ED5666',
+                    color: '#F06292',
                     translucent: false,
                 },
             },
@@ -69,19 +76,14 @@ class ExpenseList extends Component<Props> {
                             {data.merchant}
                         </Text>
                         <Text style={[styles.itemEnd, styles.amount]}>
-                            {data.amount.currency} {data.amount.value}
+                            {data.amount.value} {data.amount.currency}
                         </Text>
                     </View>
-                    <Text style={[styles.itemRow, styles.item]}>
-                        {data.category !== '' ? data.category : 'Uncategorized'}{' '}
-                        {moment(data.date).format('YYYY-MM-DD')}
-                    </Text>
                     <View style={styles.itemRow}>
                         <Text style={styles.item}>
-                            Expense for {data.user.first} {data.user.last}
+                            For {data.user.first} {data.user.last}
                         </Text>
-                        <Text style={[styles.itemEnd, styles.comment]}>
-                            {data.category === '' ? '(No comment)' : 'Comment (1)'}
+                        <Text style={[styles.itemEnd, styles.date]}>{moment(data.date, 'YYYY-MM-DD').fromNow()}
                         </Text>
                     </View>
                 </View>
@@ -90,28 +92,10 @@ class ExpenseList extends Component<Props> {
     }
 
     _onPress(item: Expense) {
-        let {merchant} = item;
-        let pageTitle = `${merchant.toUpperCase()} EXPENSE`;
-
-        Navigation.push(this.props.componentId, {
-            component: {
-                name: 'ExpenseDetails',
-                passProps: {
-                    expense: item,
-                },
-                options: {
-                    topBar: {
-                        title: {
-                            text: pageTitle,
-                        },
-                    },
-                },
-            },
-        });
+        NativeModules.ExpenseDetailsModule.displayExpenseDetails(item);
     }
 
     render() {
-        console.log(store.getState());
         if (this.props.isLoading) {
             return (
                 <View style={styles.loader}>
@@ -137,15 +121,10 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         backgroundColor: 'white',
-        marginVertical: 2,
-        marginStart: 0,
-        marginEnd: 8,
-        borderLeftWidth: 8,
-        borderLeftColor: '#63CCF2',
+        padding: 16,
     },
     item: {
         fontSize: 14,
-        padding: 8,
         color: '#696969',
     },
     itemSeparator: {
@@ -156,14 +135,13 @@ const styles = StyleSheet.create({
     itemRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        marginBottom: 16,
     },
     itemStart: {
         alignSelf: 'flex-start',
-        marginStart: 8,
     },
     itemEnd: {
         alignSelf: 'flex-end',
-        marginEnd: 8,
     },
     container: {
         flex: 1,
@@ -176,8 +154,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     list: {
-        paddingVertical: 4,
-        margin: 4,
         backgroundColor: '#fff',
     },
     merchant: {
@@ -187,17 +163,20 @@ const styles = StyleSheet.create({
     },
     amount: {
         color: '#696969',
-        fontWeight: 'bold',
         fontSize: 16,
     },
     comment: {
         color: '#696969',
     },
+    date: {
+        fontSize: 14,
+        color: '#696969',
+    }
+
 });
 
 
 const mapStateToProps = (appState: AppState) => {
-    console.log('Calling mapstatetoprops');
     return {expenses: appState.expenseState.expenses, isLoading: appState.expenseState.isLoading}
 };
 

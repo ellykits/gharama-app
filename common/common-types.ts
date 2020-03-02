@@ -6,6 +6,8 @@ export interface Expense {
     merchant: string
     amount: Amount
     user: User
+    receipts: String[]
+    index: number
 }
 
 interface Amount {

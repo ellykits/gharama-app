@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">DapaniApp</string>
+    <string name="user">USER</string>
+    <string name="comment_label">COMMENT</string>
+    <string name="leave_your_comment_here">Leave your comment here…</string>
+    <string name="merchant">%s:\u0020</string>
+    <string name="comment">%d</string>
+    <string name="receipt">%d</string>
+    <string name="back">Back to Expenses</string>
+    <string name="receipts">Receipts</string>
+    <string name="comments">Comment</string>
+    <string name="post">POST</string>
+    <string name="take_photo_select_picture">Take photo/select picture</string>
+    <string name="uncategorized">Uncategorized</string>
+    <string name="dapani_app">DAPANI APP</string>
 </resources>
