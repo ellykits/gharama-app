@@ -23,10 +23,15 @@ export default class ExpenseService {
             .then(result => Promise.resolve(result))
             .catch(err => console.log(err));
     }
+
     async fetchExpenses(): Promise<Expense[]> {
         return await fetch(this.URL, {method: 'GET'})
             .then(response => response.json())
             .then(result => result.expenses)
+    }
+
+    uploadReceipt(filePath: string, id: string) {
+
     }
 
     dispatchSaveExpenses(expenses: Expense[]) {

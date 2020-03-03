@@ -9,12 +9,13 @@ import {
     NativeEventEmitter,
 } from 'react-native';
 import ItemSeparator from "../components/item-separator";
-import {Expense} from "../common/common-types";
+import {Expense, ImageItem} from "../common/common-types";
 import {connect} from "react-redux";
 import ExpenseService from "../services/expense-service";
 import {AppState} from "../store";
 import {NativeModules} from 'react-native';
 import moment from "moment";
+import {Navigation} from "react-native-navigation";
 
 interface Props {
     componentId: string;
@@ -25,6 +26,34 @@ interface Props {
 class ExpenseList extends Component<Props> {
 
     private expenseService = new ExpenseService();
+
+    private receipts: ImageItem[] = [
+
+        {
+            source: {uri: "https://stimg.cardekho.com/images/carexteriorimages/360x240/Ferrari/Ferrari-Portofino/047.jpg"},
+            title: "Title two"
+        },
+        {
+            source: {uri: "https://rollr.io/wp-content/uploads/2017/02/mini-home-car.jpg"},
+            title: "Title three"
+        },
+        {
+            source: {
+                uri: "https://www.bmw-speedmotorwagen.in/sites/default/files/styles/nostyle/public/slider_banner_image/2018-02/M4Coupe-Header_Banner_17.jpg?itok=zmJWURhi"
+            },
+            title: "Title four"
+        },
+        {
+            source: {
+                uri: "https://img.etimg.com/thumb/msid-67103187,width-1200,height-900,resizemode-4,imgsize-96644/car-getty.jpg"
+            },
+            title: "Title fiv"
+        },
+        {
+            source: {uri: "https://hips.hearstapps.com/amv-prod-cad-assets.s3.amazonaws.com/vdat/submodels/dodge_challenger_dodge-challenger_2019-1545059179866.jpg"},
+            title: "Title siz"
+        }
+    ];
 
     constructor(props: Props) {
         super(props);
@@ -94,6 +123,28 @@ class ExpenseList extends Component<Props> {
 
     _onPress(item: Expense) {
         NativeModules.ExpenseDetailsModule.displayExpenseDetails(item);
+    }
+
+    _navigateToReceiptsPage(item: Expense) {
+        Navigation.push(this.props.componentId, {
+            component: {
+                name: 'ExpenseReceipts',
+                passProps: {
+                    receipts: this.receipts,
+                },
+                options: {
+                    topBar: {
+                        visible: true,
+                        title: {
+                            text: `${item.merchant} RECEIPTS`
+                        },
+                        backButton: {
+                            color: "#ffffff"
+                        }
+                    },
+                },
+            },
+        });
     }
 
     render() {

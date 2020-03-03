@@ -1,3 +1,5 @@
+import {ImageSource} from "react-native-image-viewing/dist/@types";
+
 export interface Expense {
     id: string
     category: string
@@ -19,4 +21,14 @@ interface User {
     first: string
     last: string
     email: string
+}
+
+/**
+ * Types for Image Viewer
+ */
+export interface ImageItem {
+    width?: number,
+    height?: number
+    source: ImageSource,
+    title?: string | number
 }

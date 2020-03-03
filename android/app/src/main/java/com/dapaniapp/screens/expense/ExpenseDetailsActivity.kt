@@ -37,7 +37,6 @@ class ExpenseDetailsActivity : ReactActivity() {
     private var expenseIndex = -1
     private var expenseId: String? = null
     private val expenseService = RetrofitServiceBuilder.buildService(ExpenseDataService::class.java)
-
     private val writableMap: WritableMap =
         Arguments.createMap().apply {
             putString("event_source", ExpenseDetailsActivity::class.java.simpleName)
