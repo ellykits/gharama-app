@@ -1,5 +1,5 @@
 import {store} from "../store";
-import {saveExpensesAction} from "../actions/fetch-expense-action";
+import {saveExpensesAction, updateExpenseCommentAction} from "../actions/expense-actions";
 import {Expense} from "../common/common-types";
 
 interface Comment {
@@ -23,13 +23,6 @@ export default class ExpenseService {
             .then(result => Promise.resolve(result))
             .catch(err => console.log(err));
     }
-
-    postComment(expenseId: string, comment: Comment) {
-        this._performPostRequest(`${this.URL}/${expenseId}`, comment)
-            .then(result => console.log(result))
-            .catch(err => console.log(err));
-    }
-
     async fetchExpenses(): Promise<Expense[]> {
         return await fetch(this.URL, {method: 'GET'})
             .then(response => response.json())
@@ -38,5 +31,9 @@ export default class ExpenseService {
 
     dispatchSaveExpenses(expenses: Expense[]) {
         store.dispatch(saveExpensesAction(expenses))
+    }
+
+    dispatchUpdateExpenseComment(index: number, comment: string) {
+        store.dispatch(updateExpenseCommentAction(index, comment))
     }
 }

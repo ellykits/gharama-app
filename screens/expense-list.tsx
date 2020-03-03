@@ -38,10 +38,11 @@ class ExpenseList extends Component<Props> {
 
         const eventEmitter = new NativeEventEmitter(NativeModules.ExpenseDetailsModule);
         eventEmitter.addListener('UploadImageEvent', (event) => {
-            console.log(event)
+            console.log(event);
         });
         eventEmitter.addListener('PostCommentEvent', (event) => {
-            console.log(event)
+            console.log(event);
+            this.expenseService.dispatchUpdateExpenseComment(event.index, event.comment);
         });
     }
 

@@ -1,4 +1,4 @@
 import {combineReducers} from 'redux'
-import {expenseReducer} from './fetch-expenses-reducer'
+import {expenseReducer} from './expense-reducers'
 
 export const expensesReducers = combineReducers({expenseState: expenseReducer});

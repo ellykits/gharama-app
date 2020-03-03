@@ -133,11 +133,13 @@
 
             <TextView
                 android:id="@+id/commentTextTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
                 android:textColor="@color/black"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/commentLabel" />
 
@@ -247,8 +249,11 @@
             android:layout_marginBottom="8dp"
             android:background="@null"
             android:hint="@string/leave_your_comment_here"
-            android:inputType="textPersonName"
             android:padding="8dp"
+            android:maxLines="4"
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:scrollbars="vertical"
             android:textColorHint="@color/hint_color"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/postTextView"
