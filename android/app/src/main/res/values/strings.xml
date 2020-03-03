@@ -13,4 +13,6 @@
     <string name="take_photo_select_picture">Take photo/select picture</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="dapani_app">DAPANI APP</string>
+    <string name="error_posting_comment">Error posting comment. Try again later.</string>
+    <string name="no_blank_comment">Please add a comment.</string>
 </resources>

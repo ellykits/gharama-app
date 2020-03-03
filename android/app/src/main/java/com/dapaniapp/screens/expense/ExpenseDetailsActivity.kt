@@ -7,6 +7,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.CallSuper
 import com.dapaniapp.R
+import com.dapaniapp.data.Expense
+import com.dapaniapp.data.ExpenseDataService
+import com.dapaniapp.data.RetrofitServiceBuilder
 import com.dapaniapp.screens.expense.ExpenseDetailsModule.Companion.IMAGE_UPLOAD_REQ_CODE
 import com.dapaniapp.utils.RNBrideUtil
 import com.facebook.react.ReactActivity
@@ -15,11 +18,15 @@ import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.WritableMap
 import com.github.dhaval2404.imagepicker.ImagePicker
 import kotlinx.android.synthetic.main.activity_expense_details.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import timber.log.Timber
 import java.util.*
 
 const val UPLOAD_IMAGE_EVENT = "UploadImageEvent"
 const val POST_COMMENT_EVENT = "PostCommentEvent"
+const val COMMENT = "comment"
 
 class ExpenseDetailsActivity : ReactActivity() {
 
@@ -29,13 +36,12 @@ class ExpenseDetailsActivity : ReactActivity() {
 
     private var expenseIndex = -1
     private var expenseId: String? = null
+    private val expenseService = RetrofitServiceBuilder.buildService(ExpenseDataService::class.java)
 
     private val writableMap: WritableMap =
         Arguments.createMap().apply {
             putString("event_source", ExpenseDetailsActivity::class.java.simpleName)
             putString("timestamp", Date().toString())
-            putString("expense_id", expenseId)
-            putInt("expense_index", expenseIndex)
         }
 
     @CallSuper
@@ -43,6 +49,13 @@ class ExpenseDetailsActivity : ReactActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense_details)
         initViews()
+        expenseId = intent?.getStringExtra("id")
+        expenseIndex = intent?.getDoubleExtra("index", -1.0)!!.toInt()
+        writableMap.apply {
+            putString("id", expenseId)
+            putInt("index", expenseIndex)
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -62,7 +75,7 @@ class ExpenseDetailsActivity : ReactActivity() {
                     Timber.e("Error: $errorMessage")
                     Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
                     RNBrideUtil.sendEvent(
-                        reactContext, POST_COMMENT_EVENT,
+                        reactContext, UPLOAD_IMAGE_EVENT,
                         writableMap.copy().apply { putString("file_upload_error", errorMessage) })
                 }
             }
@@ -74,26 +87,24 @@ class ExpenseDetailsActivity : ReactActivity() {
         photoImageView.setOnClickListener { pickImage() }
 
         with(intent) {
-            expenseId = getStringExtra("id")
-            expenseIndex = getDoubleExtra("index", -1.0).toInt()
             merchantTextView.text = getString(R.string.merchant, getStringExtra("merchant"))
             val category = getStringExtra("category")
             categoryTextView.text =
                 if (category.isNullOrBlank()) getString(R.string.uncategorized) else category
             dateTextView.text = getStringExtra("date")
-            commentTextTextView.text = getStringExtra("comment")
-            val commentCount = if (getStringExtra("comment")!!.isEmpty()) 0 else 1
+            commentTextTextView.text = getStringExtra(COMMENT)
+            val commentCount = if (getStringExtra(COMMENT)!!.isEmpty()) 0 else 1
             commentTextView.apply { text = getString(R.string.comment, commentCount) }
             commentTextTextView.visibility = if (commentCount == 1) View.VISIBLE else View.GONE
             commentLabel.visibility = if (commentCount == 1) View.VISIBLE else View.GONE
-            commentEditText.setText(getStringExtra("comment"))
+            commentEditText.setText(getStringExtra(COMMENT))
 
             postTextView.setOnClickListener {
-                RNBrideUtil.sendEvent(
-                    reactContext, UPLOAD_IMAGE_EVENT,
-                    writableMap.copy().apply {
-                        putString("comment", commentEditText.text.toString())
-                    })
+                if (commentEditText.text.toString().isNotBlank()) {
+                    postComment(commentEditText.text.toString())
+                } else Toast.makeText(
+                    this@ExpenseDetailsActivity, R.string.no_blank_comment, Toast.LENGTH_LONG
+                ).show()
             }
             getBundleExtra("user")?.let {
                 val firstName = it.getString("first")
@@ -120,5 +131,36 @@ class ExpenseDetailsActivity : ReactActivity() {
     private fun pickImage() {
         ImagePicker.with(this).cropSquare().maxResultSize(1024, 720)
             .start(IMAGE_UPLOAD_REQ_CODE)
+    }
+
+    private fun postComment(comment: String) {
+        expenseService.postComment(id = expenseId!!, expense = Expense(comment)).enqueue(
+            object : Callback<Expense> {
+                override fun onFailure(call: Call<Expense>, t: Throwable) {
+                    Toast.makeText(
+                        this@ExpenseDetailsActivity, R.string.error_posting_comment,
+                        Toast.LENGTH_LONG
+                    ).show()
+                    Timber.e(t)
+                }
+
+                override fun onResponse(call: Call<Expense>, response: Response<Expense>) {
+                    if (response.isSuccessful) {
+                        commentTextTextView.apply {
+                            text = response.body()?.comment
+                            visibility = View.VISIBLE
+                        }
+                        commentTextView.text = 1.toString()
+                        commentLabel.visibility = View.VISIBLE
+
+                        //communicate to JS code via event
+                        RNBrideUtil.sendEvent(
+                            reactContext, POST_COMMENT_EVENT,
+                            writableMap.copy().apply {
+                                putString(COMMENT, commentEditText.text.toString())
+                            })
+                    }
+                }
+            })
     }
 }
