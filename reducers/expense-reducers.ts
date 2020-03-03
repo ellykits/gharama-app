@@ -1,6 +1,5 @@
-import {AppActions, ExpenseActions, ExpenseState, SAVE_EXPENSES, UPDATE_EXPENSE_COMMENT} from "../common/redux-types";
-import {castDraft, produce} from "immer";
-import {Expense} from "../common/common-types";
+import {ExpenseActions, ExpenseState, SAVE_EXPENSES, UPDATE_EXPENSE_COMMENT} from "../common/redux-types";
+import {produce} from "immer";
 
 const expenseDefaultState: ExpenseState = {
     expenses: [],
@@ -11,6 +10,7 @@ const expenseReducer = (state = expenseDefaultState, action: ExpenseActions): Ex
     switch (action.type) {
         case "SAVE_EXPENSES":
             return produce(state, draft => {
+                draft.expenses = [];
                 action.payload.forEach(expense =>
                     draft.expenses.push(expense)
                 );
