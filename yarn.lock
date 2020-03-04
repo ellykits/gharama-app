@@ -5756,11 +5756,6 @@ react-lifecycles-compat@2.0.0:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-2.0.0.tgz#71d9c4cde47114c4102454f76da055c2bc48c948"
   integrity sha512-txfpPCQYiazVdcbMRhatqWKcAxJweUu2wDXvts5/7Wyp6+Y9cHojqXHsLPEckzutfHlxZhG8Oiundbmp8Fd6eQ==
 
-react-native-image-viewing@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/react-native-image-viewing/-/react-native-image-viewing-0.1.7.tgz#512b2c8afa55bcbae57e42913de9ffeb18a13051"
-  integrity sha512-+nTNwiXcI6bmbjkIEnW3sI1bN4/0WFEFfhDeYmEsJBVklWa79RfuxhGYImDoeDaJE9+Zez+dWi/HnMV2nEDR3Q==
-
 react-native-mock-render@^0.1.8:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/react-native-mock-render/-/react-native-mock-render-0.1.8.tgz#fe74a0f9e82bd17ed906926d7138d098dfd9acde"

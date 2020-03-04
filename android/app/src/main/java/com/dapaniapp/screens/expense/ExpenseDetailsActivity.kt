@@ -1,9 +1,11 @@
 package com.dapaniapp.screens.expense
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.CallSuper
 import com.dapaniapp.R
@@ -11,6 +13,8 @@ import com.dapaniapp.data.Expense
 import com.dapaniapp.data.ExpenseDataService
 import com.dapaniapp.data.RetrofitServiceBuilder
 import com.dapaniapp.screens.expense.ExpenseDetailsModule.Companion.IMAGE_UPLOAD_REQ_CODE
+import com.dapaniapp.screens.receipts.MERCHANT
+import com.dapaniapp.screens.receipts.ReceiptsActivity
 import com.dapaniapp.utils.RNBrideUtil
 import com.facebook.react.ReactActivity
 import com.facebook.react.bridge.Arguments
@@ -24,9 +28,11 @@ import retrofit2.Response
 import timber.log.Timber
 import java.util.*
 
+
 const val UPLOAD_IMAGE_EVENT = "UploadImageEvent"
 const val POST_COMMENT_EVENT = "PostCommentEvent"
 const val COMMENT = "comment"
+const val RECEIPTS = "receipts"
 
 class ExpenseDetailsActivity : ReactActivity() {
 
@@ -34,6 +40,7 @@ class ExpenseDetailsActivity : ReactActivity() {
         lateinit var reactContext: ReactContext
     }
 
+    private var merchant: String? = null
     private var expenseIndex = -1
     private var expenseId: String? = null
     private val expenseService = RetrofitServiceBuilder.buildService(ExpenseDataService::class.java)
@@ -42,19 +49,22 @@ class ExpenseDetailsActivity : ReactActivity() {
             putString("event_source", ExpenseDetailsActivity::class.java.simpleName)
             putString("timestamp", Date().toString())
         }
+    lateinit var receipts: ArrayList<String>
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense_details)
+        with(intent) {
+            expenseId = getStringExtra("id")
+            expenseIndex = getDoubleExtra("index", -1.0).toInt()
+            merchant = getStringExtra("merchant")
+        }
         initViews()
-        expenseId = intent?.getStringExtra("id")
-        expenseIndex = intent?.getDoubleExtra("index", -1.0)!!.toInt()
         writableMap.apply {
             putString("id", expenseId)
             putInt("index", expenseIndex)
         }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -65,14 +75,13 @@ class ExpenseDetailsActivity : ReactActivity() {
                 Activity.RESULT_OK -> {
                     Timber.i("Path: ${ImagePicker.getFilePath(data)}")
                     val file = ImagePicker.getFile(data)!!.path
-                    Toast.makeText(this, file, Toast.LENGTH_SHORT).show()
                     RNBrideUtil.sendEvent(
                         reactContext, UPLOAD_IMAGE_EVENT,
                         writableMap.copy().apply { putString("file_name", file) })
                 }
                 ImagePicker.RESULT_ERROR -> {
                     Timber.e("Error: $errorMessage")
-                    Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+                    showToast(errorMessage)
                     RNBrideUtil.sendEvent(
                         reactContext, UPLOAD_IMAGE_EVENT,
                         writableMap.copy().apply { putString("file_upload_error", errorMessage) })
@@ -82,11 +91,11 @@ class ExpenseDetailsActivity : ReactActivity() {
     }
 
     private fun initViews() {
-        backTextView.setOnClickListener { finish() }
+        backToDetailsTextView.setOnClickListener { finish() }
         photoImageView.setOnClickListener { pickImage() }
 
         with(intent) {
-            merchantTextView.text = getString(R.string.merchant, getStringExtra("merchant"))
+            merchantTextView.text = getString(R.string.merchant, merchant)
             val category = getStringExtra("category")
             categoryTextView.text =
                 if (category.isNullOrBlank()) getString(R.string.uncategorized) else category
@@ -101,9 +110,7 @@ class ExpenseDetailsActivity : ReactActivity() {
             postTextView.setOnClickListener {
                 if (commentEditText.text.toString().isNotBlank()) {
                     postComment(commentEditText.text.toString())
-                } else Toast.makeText(
-                    this@ExpenseDetailsActivity, R.string.no_blank_comment, Toast.LENGTH_LONG
-                ).show()
+                } else showToast(getString(R.string.no_blank_comment), Toast.LENGTH_LONG)
             }
             getBundleExtra("user")?.let {
                 val firstName = it.getString("first")
@@ -122,9 +129,21 @@ class ExpenseDetailsActivity : ReactActivity() {
                 amountTextView.text = amount
             }
 
-            val receipts: List<String>? = getStringArrayListExtra("receipts")
-            receiptTextView.apply { text = getString(R.string.receipt, receipts?.size ?: 0) }
+            receipts = getStringArrayListExtra(RECEIPTS) ?: arrayListOf()
+            receiptTextView.apply {
+                text = getString(R.string.receipt, receipts.size)
+                setOnClickListener { displayReceipts() }
+            }
+            receiptLabelTextView.setOnClickListener { displayReceipts() }
         }
+    }
+
+    private fun displayReceipts() {
+        this.startActivity(
+            Intent(this@ExpenseDetailsActivity, ReceiptsActivity::class.java)
+                .putExtra(MERCHANT, merchant)
+                .putExtra(RECEIPTS, receipts)
+        )
     }
 
     private fun pickImage() {
@@ -136,22 +155,21 @@ class ExpenseDetailsActivity : ReactActivity() {
         expenseService.postComment(id = expenseId!!, expense = Expense(comment)).enqueue(
             object : Callback<Expense> {
                 override fun onFailure(call: Call<Expense>, t: Throwable) {
-                    Toast.makeText(
-                        this@ExpenseDetailsActivity, R.string.error_posting_comment,
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showToast(getString(R.string.error_posting_comment), Toast.LENGTH_LONG)
                     Timber.e(t)
                 }
 
                 override fun onResponse(call: Call<Expense>, response: Response<Expense>) {
                     if (response.isSuccessful) {
+                        commentEditText.clearFocus()
                         commentTextTextView.apply {
                             text = response.body()?.comment
                             visibility = View.VISIBLE
                         }
                         commentTextView.text = 1.toString()
                         commentLabel.visibility = View.VISIBLE
-
+                        showToast(getString(R.string.comment_updated))
+                        hideSoftKeyBoard()
                         //communicate to JS code via event
                         RNBrideUtil.sendEvent(
                             reactContext, POST_COMMENT_EVENT,
@@ -162,4 +180,17 @@ class ExpenseDetailsActivity : ReactActivity() {
                 }
             })
     }
+
+    private fun hideSoftKeyBoard() {
+        val imm: InputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (imm.isAcceptingText) {
+            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
+        }
+    }
+}
+
+/**Extension functions**/
+fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, message, duration).show()
 }
