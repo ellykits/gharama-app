@@ -8,6 +8,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.CallSuper
+import com.dapaniapp.BuildConfig
 import com.dapaniapp.R
 import com.dapaniapp.data.Expense
 import com.dapaniapp.data.ExpenseDataService
@@ -49,7 +50,7 @@ class ExpenseDetailsActivity : ReactActivity() {
             putString("event_source", ExpenseDetailsActivity::class.java.simpleName)
             putString("timestamp", Date().toString())
         }
-    lateinit var receipts: ArrayList<String>
+    private val receipts = arrayListOf<String>()
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -128,8 +129,13 @@ class ExpenseDetailsActivity : ReactActivity() {
                 val amount = "$currency $value"
                 amountTextView.text = amount
             }
+            extras?.getParcelableArrayList<Bundle>(RECEIPTS)?.forEach { parcelableBundle ->
+                parcelableBundle.getString("url")?.let {
+                    val filePath = BuildConfig.EXPENSES_BASE_URL.plus(it.substring(1))
+                    receipts.add(filePath)
+                }
+            }
 
-            receipts = getStringArrayListExtra(RECEIPTS) ?: arrayListOf()
             receiptTextView.apply {
                 text = getString(R.string.receipt, receipts.size)
                 setOnClickListener { displayReceipts() }

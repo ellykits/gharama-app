@@ -39,6 +39,7 @@ class ExpenseList extends Component<Props> {
         const eventEmitter = new NativeEventEmitter(NativeModules.ExpenseDetailsModule);
         eventEmitter.addListener('UploadImageEvent', (event) => {
             console.log(event);
+            this.expenseService.uploadReceipt(event.file_name, event.id, (progress => console.log(progress)));
         });
         eventEmitter.addListener('PostCommentEvent', (event) => {
             console.log(event);
