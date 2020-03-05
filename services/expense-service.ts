@@ -1,5 +1,5 @@
 import {store} from "../store";
-import {saveExpensesAction, updateExpenseCommentAction} from "../actions/expense-actions";
+import {saveExpensesAction, updateExpenseCommentAction, updateExpenseReceipt} from "../actions/expense-actions";
 import {Expense} from "../common/common-types";
 import moment from "moment";
 
@@ -13,8 +13,7 @@ export default class ExpenseService {
             .then(result => result.expenses)
     }
 
-    uploadReceipt(filePath: string, id: string, uploadStatus: (expense: Expense | null) => void) {
-
+    uploadReceipt(filePath: string, id: string, uploadReceiptCallback: (expense: Expense | null) => void) {
         const formData = new FormData();
         formData.append('name', 'receipt');
         formData.append('receipt', {
@@ -30,11 +29,11 @@ export default class ExpenseService {
             .then(response => response.json())
             .then(response => {
                 console.log('upload success', response);
-                uploadStatus(response)
+                uploadReceiptCallback(response)
             })
             .catch(error => {
                 console.error('upload error', error);
-                uploadStatus(null)
+                uploadReceiptCallback(null)
             });
     }
 
@@ -42,7 +41,11 @@ export default class ExpenseService {
         store.dispatch(saveExpensesAction(expenses))
     }
 
-    dispatchUpdateExpenseComment(index: number, comment: string) {
-        store.dispatch(updateExpenseCommentAction(index, comment))
+    dispatchUpdateExpenseComment(id: string, comment: string) {
+        store.dispatch(updateExpenseCommentAction(id, comment))
+    }
+
+    dispatchUpdateExpenseReceipt(expense: Expense) {
+        store.dispatch(updateExpenseReceipt(expense))
     }
 }

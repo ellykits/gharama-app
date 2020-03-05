@@ -1,8 +1,10 @@
 package com.dapaniapp.screens.receipts
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.dapaniapp.BuildConfig
 import com.dapaniapp.R
 import com.dapaniapp.screens.expense.RECEIPTS
 import com.squareup.picasso.Picasso
@@ -10,13 +12,13 @@ import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.activity_receipts.*
 import java.util.*
 
-const val MERCHANT = "MERCHANT"
+const val MERCHANT = "merchant"
 
 class ReceiptsActivity : AppCompatActivity() {
 
     private lateinit var receiptViewer: StfalconImageViewer<String>
 
-    private lateinit var receiptImageUrlList: List<String>
+    private val receiptImageUrlList = arrayListOf<String>()
 
     @ExperimentalStdlibApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +33,9 @@ class ReceiptsActivity : AppCompatActivity() {
             )
             setOnClickListener { finish() }
         }
-        receiptImageUrlList = intent?.getStringArrayListExtra(RECEIPTS) ?: listOf()
+
+        intent.mapReceiptObjectToString(receiptImageUrlList)
+
         if (receiptImageUrlList.isEmpty()) {
             infoLabel.apply {
                 text = getString(R.string.no_receipts)
@@ -69,5 +73,14 @@ class ReceiptsActivity : AppCompatActivity() {
 fun ImageView.loadImage(url: String?) {
     this.apply {
         Picasso.get().load(url).into(this)
+    }
+}
+
+fun Intent.mapReceiptObjectToString(receipts: ArrayList<String>) {
+    extras?.getParcelableArrayList<Bundle>(RECEIPTS)?.forEach { parcelableBundle ->
+        parcelableBundle.getString("url")?.let {
+            val filePath = BuildConfig.EXPENSES_BASE_URL.plus(it.substring(1))
+            receipts.add(filePath)
+        }
     }
 }

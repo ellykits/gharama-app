@@ -1,10 +1,15 @@
-import {ExpenseActions, ExpenseState, SAVE_EXPENSES, UPDATE_EXPENSE_COMMENT} from "../common/redux-types";
+import {ExpenseActions, ExpenseState} from "../common/redux-types";
 import {produce} from "immer";
+import {Expense} from "../common/common-types";
 
 const expenseDefaultState: ExpenseState = {
     expenses: [],
     isLoading: true
 };
+
+function findExpense(draft: ExpenseState, id: string): Expense | undefined {
+    return draft["expenses"].find(exp => exp.id === id);
+}
 
 const expenseReducer = (state = expenseDefaultState, action: ExpenseActions): ExpenseState => {
     switch (action.type) {
@@ -18,9 +23,18 @@ const expenseReducer = (state = expenseDefaultState, action: ExpenseActions): Ex
             });
         case "UPDATE_EXPENSE_COMMENT":
             return produce(state, draft => {
-                const updatedExpense = draft["expenses"].find(exp => exp.index === action.payload.index);
+                const updatedExpense = findExpense(draft, action.payload.id);
                 if (updatedExpense) {
                     updatedExpense.comment = action.payload.comment
+                }
+            });
+        case "UPDATE_EXPENSE_RECEIPT":
+            return produce(state, draft => {
+                const updatedExpense = findExpense(draft, action.payload.id);
+                if (updatedExpense) {
+                    action.payload.receipts.forEach(receipt =>
+                        updatedExpense.receipts.push(receipt)
+                    );
                 }
             });
         default:

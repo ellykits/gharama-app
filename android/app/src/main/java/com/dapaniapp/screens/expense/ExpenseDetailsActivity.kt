@@ -8,13 +8,11 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.CallSuper
-import com.dapaniapp.BuildConfig
 import com.dapaniapp.R
 import com.dapaniapp.data.Expense
 import com.dapaniapp.data.ExpenseDataService
 import com.dapaniapp.data.RetrofitServiceBuilder
 import com.dapaniapp.screens.expense.ExpenseDetailsModule.Companion.IMAGE_UPLOAD_REQ_CODE
-import com.dapaniapp.screens.receipts.MERCHANT
 import com.dapaniapp.screens.receipts.ReceiptsActivity
 import com.dapaniapp.utils.RNBrideUtil
 import com.facebook.react.ReactActivity
@@ -28,7 +26,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import timber.log.Timber
 import java.util.*
-
 
 const val UPLOAD_IMAGE_EVENT = "UploadImageEvent"
 const val POST_COMMENT_EVENT = "PostCommentEvent"
@@ -50,7 +47,7 @@ class ExpenseDetailsActivity : ReactActivity() {
             putString("event_source", ExpenseDetailsActivity::class.java.simpleName)
             putString("timestamp", Date().toString())
         }
-    private val receipts = arrayListOf<String>()
+    private lateinit var receipts: ArrayList<Bundle>
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,7 +100,10 @@ class ExpenseDetailsActivity : ReactActivity() {
             dateTextView.text = getStringExtra("date")
             commentTextTextView.text = getStringExtra(COMMENT)
             val commentCount = if (getStringExtra(COMMENT)!!.isEmpty()) 0 else 1
-            commentTextView.apply { text = getString(R.string.comment, commentCount) }
+            commentTextView.apply {
+                text = getString(R.string.comment, commentCount)
+                setOnClickListener { commentEditText.requestFocus() }
+            }
             commentTextTextView.visibility = if (commentCount == 1) View.VISIBLE else View.GONE
             commentLabel.visibility = if (commentCount == 1) View.VISIBLE else View.GONE
             commentEditText.setText(getStringExtra(COMMENT))
@@ -129,13 +129,7 @@ class ExpenseDetailsActivity : ReactActivity() {
                 val amount = "$currency $value"
                 amountTextView.text = amount
             }
-            extras?.getParcelableArrayList<Bundle>(RECEIPTS)?.forEach { parcelableBundle ->
-                parcelableBundle.getString("url")?.let {
-                    val filePath = BuildConfig.EXPENSES_BASE_URL.plus(it.substring(1))
-                    receipts.add(filePath)
-                }
-            }
-
+            receipts = extras?.getParcelableArrayList<Bundle>(RECEIPTS) ?: arrayListOf()
             receiptTextView.apply {
                 text = getString(R.string.receipt, receipts.size)
                 setOnClickListener { displayReceipts() }
@@ -147,8 +141,7 @@ class ExpenseDetailsActivity : ReactActivity() {
     private fun displayReceipts() {
         this.startActivity(
             Intent(this@ExpenseDetailsActivity, ReceiptsActivity::class.java)
-                .putExtra(MERCHANT, merchant)
-                .putExtra(RECEIPTS, receipts)
+                .putExtras(intent)
         )
     }
 

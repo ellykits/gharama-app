@@ -19,4 +19,6 @@
     <string name="back_to_details">Back to %s Details</string>
     <string name="no_receipts">No expense receipts available</string>
     <string name="comment_updated">Comment updated</string>
+    <string name="error_uploading_receipt">Error uploading receipt. Try again later</string>
+    <string name="uploading_receipt_successful">Receipt uploaded successfully</string>
 </resources>

@@ -3,6 +3,7 @@ package com.dapaniapp;
 import android.content.Context;
 
 import com.dapaniapp.screens.expense.ExpenseDetailsPackage;
+import com.dapaniapp.screens.receipts.ReceiptsPackage;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactNativeHost;
@@ -62,6 +63,7 @@ public class MainApplication extends NavigationApplication implements ReactAppli
     protected List<ReactPackage> getPackages() {
         List<ReactPackage> packages = new PackageList(this).getPackages();
         packages.add(new ExpenseDetailsPackage());
+        packages.add(new ReceiptsPackage());
         return packages;
     }
 
