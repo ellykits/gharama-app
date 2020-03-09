@@ -2,6 +2,10 @@ package com.dapaniapp;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelStore;
+import androidx.lifecycle.ViewModelStoreOwner;
+
 import com.dapaniapp.screens.expense.ExpenseDetailsPackage;
 import com.dapaniapp.screens.receipts.ReceiptsPackage;
 import com.facebook.react.PackageList;
@@ -16,7 +20,9 @@ import com.reactnativenavigation.react.ReactGateway;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class MainApplication extends NavigationApplication implements ReactApplication {
+public class MainApplication extends NavigationApplication implements ReactApplication, ViewModelStoreOwner {
+
+    private final ViewModelStore appViewModelStore = new ViewModelStore();
 
     private final ReactNativeHost mReactNativeHost =
             new ReactNativeHost(this) {
@@ -100,4 +106,15 @@ public class MainApplication extends NavigationApplication implements ReactAppli
         return getPackages();
     }
 
+    @NonNull
+    @Override
+    public ViewModelStore getViewModelStore() {
+        return appViewModelStore;
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        getViewModelStore().clear();
+    }
 }

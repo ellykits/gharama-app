@@ -32,9 +32,7 @@ const expenseReducer = (state = expenseDefaultState, action: ExpenseActions): Ex
             return produce(state, draft => {
                 const updatedExpense = findExpense(draft, action.payload.id);
                 if (updatedExpense) {
-                    action.payload.receipts.forEach(receipt =>
-                        updatedExpense.receipts.push(receipt)
-                    );
+                    updatedExpense.receipts = action.payload.receipts
                 }
             });
         default:

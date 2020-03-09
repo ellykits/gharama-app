@@ -8,11 +8,15 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.CallSuper
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.dapaniapp.MainApplication
 import com.dapaniapp.R
 import com.dapaniapp.data.Expense
 import com.dapaniapp.data.ExpenseDataService
 import com.dapaniapp.data.RetrofitServiceBuilder
 import com.dapaniapp.screens.expense.ExpenseDetailsModule.Companion.IMAGE_UPLOAD_REQ_CODE
+import com.dapaniapp.screens.receipts.ReceiptViewModel
 import com.dapaniapp.screens.receipts.ReceiptsActivity
 import com.dapaniapp.utils.RNBrideUtil
 import com.facebook.react.ReactActivity
@@ -31,6 +35,7 @@ const val UPLOAD_IMAGE_EVENT = "UploadImageEvent"
 const val POST_COMMENT_EVENT = "PostCommentEvent"
 const val COMMENT = "comment"
 const val RECEIPTS = "receipts"
+const val MERCHANT = "merchant"
 
 class ExpenseDetailsActivity : ReactActivity() {
 
@@ -38,6 +43,9 @@ class ExpenseDetailsActivity : ReactActivity() {
         lateinit var reactContext: ReactContext
     }
 
+    private val receiptViewModel: ReceiptViewModel by lazy {
+        ViewModelProvider(this.application as MainApplication).get(ReceiptViewModel::class.java)
+    }
     private var merchant: String? = null
     private var expenseIndex = -1
     private var expenseId: String? = null
@@ -47,22 +55,31 @@ class ExpenseDetailsActivity : ReactActivity() {
             putString("event_source", ExpenseDetailsActivity::class.java.simpleName)
             putString("timestamp", Date().toString())
         }
-    private lateinit var receipts: ArrayList<Bundle>
 
     @CallSuper
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_expense_details)
+        initViews()
         with(intent) {
             expenseId = getStringExtra("id")
             expenseIndex = getDoubleExtra("index", -1.0).toInt()
-            merchant = getStringExtra("merchant")
         }
-        initViews()
         writableMap.apply {
             putString("id", expenseId)
             putInt("index", expenseIndex)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        receiptViewModel.receiptList.observe(this,
+            Observer<ArrayList<String>> { receipts ->
+                receiptTextView.apply {
+                    text = getString(R.string.receipt, receipts.size)
+                }
+            })
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -93,11 +110,14 @@ class ExpenseDetailsActivity : ReactActivity() {
         photoImageView.setOnClickListener { pickImage() }
 
         with(intent) {
+            merchant = getStringExtra("merchant")
             merchantTextView.text = getString(R.string.merchant, merchant)
             val category = getStringExtra("category")
             categoryTextView.text =
                 if (category.isNullOrBlank()) getString(R.string.uncategorized) else category
-            dateTextView.text = getStringExtra("date")
+            dateTextView.apply {
+                text = getStringExtra("date")
+            }
             commentTextTextView.text = getStringExtra(COMMENT)
             val commentCount = if (getStringExtra(COMMENT)!!.isEmpty()) 0 else 1
             commentTextView.apply {
@@ -129,11 +149,7 @@ class ExpenseDetailsActivity : ReactActivity() {
                 val amount = "$currency $value"
                 amountTextView.text = amount
             }
-            receipts = extras?.getParcelableArrayList<Bundle>(RECEIPTS) ?: arrayListOf()
-            receiptTextView.apply {
-                text = getString(R.string.receipt, receipts.size)
-                setOnClickListener { displayReceipts() }
-            }
+            receiptTextView.setOnClickListener { displayReceipts() }
             receiptLabelTextView.setOnClickListener { displayReceipts() }
         }
     }

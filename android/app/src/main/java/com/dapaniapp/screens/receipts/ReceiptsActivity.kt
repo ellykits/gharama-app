@@ -1,18 +1,17 @@
 package com.dapaniapp.screens.receipts
 
-import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.dapaniapp.BuildConfig
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.dapaniapp.MainApplication
 import com.dapaniapp.R
-import com.dapaniapp.screens.expense.RECEIPTS
+import com.dapaniapp.screens.expense.MERCHANT
 import com.squareup.picasso.Picasso
 import com.stfalcon.imageviewer.StfalconImageViewer
 import kotlinx.android.synthetic.main.activity_receipts.*
 import java.util.*
-
-const val MERCHANT = "merchant"
 
 class ReceiptsActivity : AppCompatActivity() {
 
@@ -20,11 +19,14 @@ class ReceiptsActivity : AppCompatActivity() {
 
     private val receiptImageUrlList = arrayListOf<String>()
 
+    private val receiptViewModel: ReceiptViewModel by lazy {
+        ViewModelProvider(this.application as MainApplication).get(ReceiptViewModel::class.java)
+    }
+
     @ExperimentalStdlibApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_receipts)
-
         backToDetailsTextView.apply {
             val merchant = intent?.getStringExtra(MERCHANT) ?: ""
             text = getString(
@@ -33,30 +35,42 @@ class ReceiptsActivity : AppCompatActivity() {
             )
             setOnClickListener { finish() }
         }
+    }
 
-        intent.mapReceiptObjectToString(receiptImageUrlList)
+    override fun onResume() {
+        super.onResume()
+        receiptViewModel.receiptList.observe(this,
+            Observer<ArrayList<String>> { receipts ->
+                receiptImageUrlList.addAll(receipts)
+                createImageViews(receipts)
+            })
+    }
 
-        if (receiptImageUrlList.isEmpty()) {
+    private fun createImageViews(receipts: ArrayList<String>) {
+        if (receipts.isEmpty()) {
             infoLabel.apply {
                 text = getString(R.string.no_receipts)
                 setCompoundDrawables(null, null, null, null)
             }
+            return
         }
-        //Create dynamic image vies and add to list
-        receiptImageUrlList.forEachIndexed { index, _ ->
-            imagesLinearLayout.addView(ImageView(this).apply {
-                adjustViewBounds = true
-                scaleType = ImageView.ScaleType.CENTER_CROP
-                loadImage(receiptImageUrlList.getOrNull(index))
-                setOnClickListener {
-                    receiptViewer = displayReceiptImage(index).also {
-                        it.withTransitionFrom(this)
-                        it.withImageChangeListener {
-                            receiptViewer.updateTransitionImage(this)
-                        }
-                    }.show()
-                }
-            })
+        imagesLinearLayout.removeAllViews()
+        receipts.reversed().forEachIndexed { index, _ ->
+            imagesLinearLayout.apply {
+                addView(ImageView(this@ReceiptsActivity).apply {
+                    adjustViewBounds = true
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    loadImage(receiptImageUrlList.getOrNull(index))
+                    setOnClickListener {
+                        receiptViewer = displayReceiptImage(index).also {
+                            it.withTransitionFrom(this)
+                            it.withImageChangeListener {
+                                receiptViewer.updateTransitionImage(this)
+                            }
+                        }.show()
+                    }
+                })
+            }
         }
     }
 
@@ -73,14 +87,5 @@ class ReceiptsActivity : AppCompatActivity() {
 fun ImageView.loadImage(url: String?) {
     this.apply {
         Picasso.get().load(url).into(this)
-    }
-}
-
-fun Intent.mapReceiptObjectToString(receipts: ArrayList<String>) {
-    extras?.getParcelableArrayList<Bundle>(RECEIPTS)?.forEach { parcelableBundle ->
-        parcelableBundle.getString("url")?.let {
-            val filePath = BuildConfig.EXPENSES_BASE_URL.plus(it.substring(1))
-            receipts.add(filePath)
-        }
     }
 }
