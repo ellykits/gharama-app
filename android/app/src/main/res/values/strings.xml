@@ -11,8 +11,14 @@
     <string name="comments">Comment</string>
     <string name="post">POST</string>
     <string name="take_photo_select_picture">Take photo/select picture</string>
-    <string name="uncategorized">Uncategorized</string>
-    <string name="dapani_app">DAPANI APP</string>
+    <string name="uncategorized">UNCATEGORIZED</string>
+    <string name="expense_app">GHARAMA APP</string>
     <string name="error_posting_comment">Error posting comment. Try again later.</string>
     <string name="no_blank_comment">Please add a comment.</string>
+    <string name="scroll_up">"Scroll up "</string>
+    <string name="back_to_details">Back to %s Details</string>
+    <string name="no_receipts">No expense receipts available</string>
+    <string name="comment_updated">Comment updated</string>
+    <string name="error_uploading_receipt">Error uploading receipt. Try again later</string>
+    <string name="uploading_receipt_successful">Receipt uploaded successfully</string>
 </resources>

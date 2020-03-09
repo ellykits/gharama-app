@@ -39,10 +39,11 @@ Navigation.events().registerAppLaunchedListener(() => {
     Navigation.setRoot({
         root: {
             stack: {
-                id: 'Expenses',
+                id: 'Stack.Expenses',
                 children: [
                     {
                         component: {
+                            id: 'Expenses',
                             name: 'Expenses',
                         },
                     },

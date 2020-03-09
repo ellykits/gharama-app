@@ -1,39 +1,51 @@
 import {store} from "../store";
-import {saveExpensesAction, updateExpenseCommentAction} from "../actions/expense-actions";
+import {saveExpensesAction, updateExpenseCommentAction, updateExpenseReceipt} from "../actions/expense-actions";
 import {Expense} from "../common/common-types";
-
-interface Comment {
-    comment: string;
-}
+import moment from "moment";
 
 export default class ExpenseService {
 
     private URL = 'http://10.0.2.2:3000/expenses';
 
-    async _performPostRequest(url: string, payload: Comment) {
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        })
-            .then(response => response.json())
-            .then(result => Promise.resolve(result))
-            .catch(err => console.log(err));
-    }
     async fetchExpenses(): Promise<Expense[]> {
         return await fetch(this.URL, {method: 'GET'})
             .then(response => response.json())
             .then(result => result.expenses)
     }
 
+    uploadReceipt(filePath: string, id: string, uploadReceiptCallback: (expense: Expense | null) => void) {
+        const formData = new FormData();
+        formData.append('name', 'receipt');
+        formData.append('receipt', {
+            uri: `file://${filePath}`,
+            name: `${id}${moment().unix()}`,
+            type: 'image/jpg'
+        });
+
+        fetch(`${this.URL}/${id}/receipts`, {
+            method: 'post',
+            body: formData,
+        })
+            .then(response => response.json())
+            .then(response => {
+                console.log('upload success', response);
+                uploadReceiptCallback(response)
+            })
+            .catch(error => {
+                console.error('upload error', error);
+                uploadReceiptCallback(null)
+            });
+    }
+
     dispatchSaveExpenses(expenses: Expense[]) {
         store.dispatch(saveExpensesAction(expenses))
     }
 
-    dispatchUpdateExpenseComment(index: number, comment: string) {
-        store.dispatch(updateExpenseCommentAction(index, comment))
+    dispatchUpdateExpenseComment(id: string, comment: string) {
+        store.dispatch(updateExpenseCommentAction(id, comment))
+    }
+
+    dispatchUpdateExpenseReceipt(expense: Expense) {
+        store.dispatch(updateExpenseReceipt(expense))
     }
 }

@@ -10,4 +10,5 @@
     <color name="black">#232F3F</color>
     <color name="comment_section_background">#f4f5f6</color>
     <color name="white">#ffffff</color>
+    <color name="dark_background">#1e272b</color>
 </resources>

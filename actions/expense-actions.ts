@@ -1,16 +1,18 @@
-import {AppActions, SAVE_EXPENSES, UPDATE_EXPENSE_COMMENT} from "../common/redux-types";
+import {AppActions, SAVE_EXPENSES, UPDATE_EXPENSE_COMMENT, UPDATE_EXPENSE_RECEIPT} from "../common/redux-types";
 import {Expense} from "../common/common-types";
-
-const URL = 'http://10.0.2.2:3000/expenses';
 
 export const saveExpensesAction = (expenses: Expense[]): AppActions => ({
     type: SAVE_EXPENSES,
     payload: expenses,
 });
 
-
-export const updateExpenseCommentAction = (index: number, comment: string): AppActions => ({
+export const updateExpenseCommentAction = (id: string, comment: string): AppActions => ({
     type: UPDATE_EXPENSE_COMMENT,
-    payload: {index, comment},
+    payload: {id, comment},
+});
+
+export const updateExpenseReceipt = (expense: Expense): AppActions => ({
+    type: UPDATE_EXPENSE_RECEIPT,
+    payload: expense
 });
 

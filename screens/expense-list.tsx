@@ -39,10 +39,17 @@ class ExpenseList extends Component<Props> {
         const eventEmitter = new NativeEventEmitter(NativeModules.ExpenseDetailsModule);
         eventEmitter.addListener('UploadImageEvent', (event) => {
             console.log(event);
+            this.expenseService.uploadReceipt(event.file_name, event.id, (expense => {
+                if (expense !== null) {
+                    this.expenseService.dispatchUpdateExpenseReceipt(expense);
+                    NativeModules.ReceiptsModule.displayReceipts(expense);
+                }
+                NativeModules.ReceiptsModule.showToastMessage(expense !== null)
+            }));
         });
         eventEmitter.addListener('PostCommentEvent', (event) => {
             console.log(event);
-            this.expenseService.dispatchUpdateExpenseComment(event.index, event.comment);
+            this.expenseService.dispatchUpdateExpenseComment(event.id, event.comment);
         });
     }
 
@@ -68,9 +75,9 @@ class ExpenseList extends Component<Props> {
         };
     }
 
-    _bindItem(data: Expense) {
+    private bindItem(data: Expense) {
         return (
-            <TouchableOpacity onPress={() => this._onPress(data)}>
+            <TouchableOpacity onPress={() => ExpenseList.onPress(data)}>
                 <View style={styles.itemWrapper}>
                     <View style={styles.itemRow}>
                         <Text style={[styles.itemStart, styles.merchant]}>
@@ -92,7 +99,7 @@ class ExpenseList extends Component<Props> {
         );
     }
 
-    _onPress(item: Expense) {
+    private static onPress(item: Expense) {
         NativeModules.ExpenseDetailsModule.displayExpenseDetails(item);
     }
 
@@ -109,7 +116,7 @@ class ExpenseList extends Component<Props> {
                 <FlatList
                     ItemSeparatorComponent={ItemSeparator}
                     data={this.props.expenses}
-                    renderItem={data => this._bindItem(data.item)}
+                    renderItem={data => this.bindItem(data.item)}
                     keyExtractor={item => item.id.toString()}
                 />
             </View>
@@ -127,11 +134,6 @@ const styles = StyleSheet.create({
     item: {
         fontSize: 14,
         color: '#696969',
-    },
-    itemSeparator: {
-        height: 1,
-        width: '100%',
-        backgroundColor: '#c7c7c7',
     },
     itemRow: {
         flexDirection: 'row',
