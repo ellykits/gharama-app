@@ -2,18 +2,19 @@ import React, {Component} from 'react';
 import {
     ActivityIndicator,
     FlatList,
+    NativeEventEmitter,
+    NativeModules,
     StyleSheet,
     Text,
+    TextInput,
     TouchableOpacity,
     View,
-    NativeEventEmitter,
 } from 'react-native';
 import ItemSeparator from "../components/item-separator";
 import {Expense} from "../common/common-types";
 import {connect} from "react-redux";
 import ExpenseService from "../services/expense-service";
 import {AppState} from "../store";
-import {NativeModules} from 'react-native';
 import moment from "moment";
 
 interface Props {
@@ -22,18 +23,24 @@ interface Props {
     isLoading: boolean
 }
 
-class ExpenseList extends Component<Props> {
+interface State {
+    filteredExpenses: Expense []
+}
+
+class ExpenseList extends Component<Props, State> {
 
     private expenseService = new ExpenseService();
 
     constructor(props: Props) {
         super(props);
+        this.state = {filteredExpenses: this.props.expenses}
     }
 
     componentDidMount(): void {
         this.expenseService.fetchExpenses()
             .then(expenses => {
                 this.expenseService.dispatchSaveExpenses(expenses);
+                this.setState({filteredExpenses: expenses})
             }).catch(error => console.log(error));
 
         const eventEmitter = new NativeEventEmitter(NativeModules.ExpenseDetailsModule);
@@ -103,6 +110,19 @@ class ExpenseList extends Component<Props> {
         NativeModules.ExpenseDetailsModule.displayExpenseDetails(item);
     }
 
+    private filterExpenses = (text: string) => {
+        const currentExpenses = this.props.expenses.filter(expense => {
+            return ExpenseList.getMatch(expense.merchant, text) || ExpenseList.getMatch(expense.user.last, text) ||
+                ExpenseList.getMatch(expense.user.first, text)
+        });
+        this.setState({filteredExpenses: currentExpenses});
+    };
+
+
+    private static getMatch(firstString: string, secondString: string) {
+        return firstString.toLowerCase().trim().match(secondString.trim().toLowerCase());
+    }
+
     render() {
         if (this.props.isLoading) {
             return (
@@ -113,9 +133,16 @@ class ExpenseList extends Component<Props> {
         }
         return (
             <View style={styles.container}>
+                <View style={styles.searchWrapper}>
+                    <TextInput
+                        onChangeText={text => this.filterExpenses(text)}
+                        placeholder={"Search by merchant/user"}
+                        style={styles.search}/>
+                </View>
+
                 <FlatList
                     ItemSeparatorComponent={ItemSeparator}
-                    data={this.props.expenses}
+                    data={this.state.filteredExpenses}
                     renderItem={data => this.bindItem(data.item)}
                     keyExtractor={item => item.id.toString()}
                 />
@@ -174,8 +201,15 @@ const styles = StyleSheet.create({
     date: {
         fontSize: 14,
         color: '#696969',
-    }
-
+    },
+    search: {
+        padding: 14,
+        marginStart: 8,
+        fontSize: 16
+    },
+    searchWrapper: {
+        backgroundColor: '#F3F4F5',
+    },
 });
 
 

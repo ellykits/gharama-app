@@ -31,6 +31,7 @@ import retrofit2.Response
 import timber.log.Timber
 import java.util.*
 
+
 const val UPLOAD_IMAGE_EVENT = "UploadImageEvent"
 const val POST_COMMENT_EVENT = "PostCommentEvent"
 const val COMMENT = "comment"
@@ -176,7 +177,6 @@ class ExpenseDetailsActivity : ReactActivity() {
 
                 override fun onResponse(call: Call<Expense>, response: Response<Expense>) {
                     if (response.isSuccessful) {
-                        commentEditText.clearFocus()
                         commentTextTextView.apply {
                             text = response.body()?.comment
                             visibility = View.VISIBLE
@@ -184,7 +184,8 @@ class ExpenseDetailsActivity : ReactActivity() {
                         commentTextView.text = 1.toString()
                         commentLabel.visibility = View.VISIBLE
                         showToast(getString(R.string.comment_updated))
-                        hideSoftKeyBoard()
+                        hideKeyboard()
+                        commentEditText.clearFocus()
                         //communicate to JS code via event
                         RNBrideUtil.sendEvent(
                             reactContext, POST_COMMENT_EVENT,
@@ -196,12 +197,9 @@ class ExpenseDetailsActivity : ReactActivity() {
             })
     }
 
-    private fun hideSoftKeyBoard() {
-        val imm: InputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (imm.isAcceptingText) {
-            imm.hideSoftInputFromWindow(currentFocus!!.windowToken, 0)
-        }
+    fun hideKeyboard() {
+        (this.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
+            .hideSoftInputFromWindow((this.currentFocus ?: View(this)).windowToken, 0)
     }
 }
 
