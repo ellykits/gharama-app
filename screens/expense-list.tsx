@@ -24,7 +24,6 @@ interface Props {
 }
 
 interface State {
-    filterText: string
     filteredExpenses: Expense []
 }
 
@@ -34,7 +33,7 @@ class ExpenseList extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {filteredExpenses: this.props.expenses, filterText: ''}
+        this.state = {filteredExpenses: this.props.expenses}
     }
 
     componentDidMount(): void {
@@ -111,12 +110,17 @@ class ExpenseList extends Component<Props, State> {
         NativeModules.ExpenseDetailsModule.displayExpenseDetails(item);
     }
 
-    private filterExpenses(text: string) {
-        this.setState({filteredExpenses: this.props.expenses, filterText: text.toLowerCase().trim()});
-        const currentExpenses = this.state.filteredExpenses.filter(expense => {
-            return expense.merchant.toLowerCase().trim().match(this.state.filterText);
+    private filterExpenses = (text: string) => {
+        const currentExpenses = this.props.expenses.filter(expense => {
+            return ExpenseList.getMatch(expense.merchant, text) || ExpenseList.getMatch(expense.user.last, text) ||
+                ExpenseList.getMatch(expense.user.first, text)
         });
-        this.setState({filteredExpenses: currentExpenses})
+        this.setState({filteredExpenses: currentExpenses});
+    };
+
+
+    private static getMatch(firstString: string, secondString: string) {
+        return firstString.toLowerCase().trim().match(secondString.trim().toLowerCase());
     }
 
     render() {
@@ -131,7 +135,7 @@ class ExpenseList extends Component<Props, State> {
             <View style={styles.container}>
                 <View style={styles.searchWrapper}>
                     <TextInput
-                        onChangeText={this.filterExpenses.bind(this)}
+                        onChangeText={text => this.filterExpenses(text)}
                         placeholder={"Search by merchant/user"}
                         style={styles.search}/>
                 </View>
