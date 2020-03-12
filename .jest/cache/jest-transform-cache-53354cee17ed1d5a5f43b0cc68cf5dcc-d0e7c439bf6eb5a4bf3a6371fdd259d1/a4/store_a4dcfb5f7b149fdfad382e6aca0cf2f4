@@ -1,0 +1,9 @@
+fe62ea82876fcefb4c3991aeb05c0df5
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.store = void 0;var _redux = require("redux");
+var _reducers = require("./reducers");
+var _reduxLogger = require("redux-logger");
+
+var store = (0, _redux.createStore)(
+_reducers.expensesReducers,
+(0, _redux.compose)(
+(0, _redux.applyMiddleware)((0, _reduxLogger.createLogger)({ collapsed: false, logErrors: true }))));exports.store = store;

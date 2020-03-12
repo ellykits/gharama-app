@@ -1,0 +1,15 @@
+70606e411b6ecdabc184ab64f15243c5
+"use strict";var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+
+
+require("react-native");
+var _react = _interopRequireDefault(require("react"));
+var _App = _interopRequireDefault(require("../App"));
+
+
+var _reactTestRenderer = _interopRequireDefault(require("react-test-renderer"));var _jsxFileName = "/home/coder/Persona/react-native/DapaniApp/__tests__/App-test.js";
+
+it('renders correctly', function () {
+  _reactTestRenderer.default.create(_react.default.createElement(_App.default, { __source: { fileName: _jsxFileName, lineNumber: 13 } }));
+});
