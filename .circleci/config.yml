@@ -10,9 +10,6 @@ jobs:
           at: .
       - rn/yarn_install
       - run:
-          command: yarn eslint
-          name: Run ESLint
-      - run:
           command: yarn flow
           name: Flow
       - run:
