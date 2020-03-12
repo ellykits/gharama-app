@@ -15,10 +15,10 @@ export interface ExpenseResponse {
 
 export default class ExpenseService {
 
-    private URL = 'http://10.0.2.2:3000/expenses';
+    static URL = 'http://10.0.2.2:3000/expenses';
 
     async fetchExpenses(offset: number, limit: number): Promise<ExpenseResponse> {
-        return await fetch(`${this.URL}?limit=${limit}&offset=${offset}`, {method: 'GET'})
+        return await fetch(`${(ExpenseService.URL)}?limit=${limit}&offset=${offset}`, {method: 'GET'})
             .then(response => response.json())
     }
 
@@ -31,7 +31,7 @@ export default class ExpenseService {
             type: 'image/jpg'
         });
 
-        fetch(`${this.URL}/${id}/receipts`, {
+        fetch(`${ExpenseService.URL}/${id}/receipts`, {
             method: 'post',
             body: formData,
         })
