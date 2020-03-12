@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   codecov: codecov/codecov@1.0.5
-  react-native: react-native-community/react-native@3.0.1
+  rn: react-native-community/react-native@3.0.1
 jobs:
   analyse_js:
     executor: rn/linux_js
