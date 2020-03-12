@@ -1,6 +1,0 @@
-9b0ba092402253731e81fc8d0c13dbf3
-"use strict";require("react-native");
-global.fetch = require('jest-fetch-mock');
-jest.mock("./__mocks__/react-native.ts");
-jest.mock('react-native-aws3', function () {return {
-    put: jest.fn() };});

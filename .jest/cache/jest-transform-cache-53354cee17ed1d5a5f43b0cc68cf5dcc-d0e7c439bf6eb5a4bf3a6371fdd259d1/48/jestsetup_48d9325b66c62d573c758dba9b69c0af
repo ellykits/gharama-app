@@ -1,3 +1,0 @@
-17237283d867179e6b9283eea4a4f3aa
-"use strict";require("react-native");
-global.fetch = require('jest-fetch-mock');

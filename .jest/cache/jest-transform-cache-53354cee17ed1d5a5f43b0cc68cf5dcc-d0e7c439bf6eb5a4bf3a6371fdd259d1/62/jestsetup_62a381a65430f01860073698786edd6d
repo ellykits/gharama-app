@@ -1,6 +1,0 @@
-20ff1ddbc1ec51c3d22a134275eac340
-"use strict";require("react-native");
-var _reactNative2 = require("./__mocks__/react-native");
-global.fetch = require('jest-fetch-mock');
-jest.mock("./__mocks__/react-native.ts");
-global.FormData = new _reactNative2.FormDataMock();

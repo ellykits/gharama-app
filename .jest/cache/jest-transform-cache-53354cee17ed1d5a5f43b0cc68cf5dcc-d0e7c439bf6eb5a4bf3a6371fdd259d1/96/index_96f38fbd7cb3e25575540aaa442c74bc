@@ -1,5 +1,0 @@
-84d1f6f8cf181628299277da0fe4272a
-"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.expensesReducers = void 0;var _redux = require("redux");
-var _expenseReducers = require("./expense-reducers");
-
-var expensesReducers = (0, _redux.combineReducers)({ expenseState: _expenseReducers.expenseReducer });exports.expensesReducers = expensesReducers;

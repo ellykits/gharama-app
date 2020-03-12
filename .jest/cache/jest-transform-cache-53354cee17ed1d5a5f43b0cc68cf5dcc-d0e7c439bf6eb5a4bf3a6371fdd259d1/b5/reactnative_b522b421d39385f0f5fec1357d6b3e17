@@ -1,3 +1,0 @@
-6c9b50b974eaa2a5faa99c8d0072c5f9
-"use strict";var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");Object.defineProperty(exports, "__esModule", { value: true });exports.FormDataMock = void 0;var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));var FormDataMock = function FormDataMock() {(0, _classCallCheck2.default)(this, FormDataMock);this.
-  append = jest.fn();};exports.FormDataMock = FormDataMock;

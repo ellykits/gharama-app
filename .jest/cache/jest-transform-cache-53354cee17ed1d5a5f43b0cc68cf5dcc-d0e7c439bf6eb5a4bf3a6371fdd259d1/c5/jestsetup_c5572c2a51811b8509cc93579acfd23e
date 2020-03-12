@@ -1,5 +1,0 @@
-a050cf4ca9b543e7f3191a8ab28ae712
-"use strict";require("react-native");
-global.fetch = require('jest-fetch-mock');
-jest.mock("./__mocks__/react-native.ts");
-jest.mock('react-native', function () {return { Request: { FormData: {} } };});

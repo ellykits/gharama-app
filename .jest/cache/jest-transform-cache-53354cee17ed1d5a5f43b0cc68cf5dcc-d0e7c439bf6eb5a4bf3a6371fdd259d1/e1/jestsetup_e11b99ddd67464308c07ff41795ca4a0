@@ -1,4 +1,0 @@
-b9f058c9aff0e2dba7506ce849fdc4d3
-"use strict";require("react-native");
-jest.mock("./__mocks__/react-native.ts");
-global.fetch = require('jest-fetch-mock');
