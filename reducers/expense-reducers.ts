@@ -4,7 +4,8 @@ import {Expense} from "../common/common-types";
 
 const expenseDefaultState: ExpenseState = {
     expenses: [],
-    isLoading: true
+    isLoading: true,
+    total: 0
 };
 
 function findExpense(draft: ExpenseState, id: string): Expense | undefined {
@@ -16,10 +17,17 @@ const expenseReducer = (state = expenseDefaultState, action: ExpenseActions): Ex
         case "SAVE_EXPENSES":
             return produce(state, draft => {
                 draft.expenses = [];
+                action.payload.expenses.forEach(expense =>
+                    draft.expenses.push(expense)
+                );
+                draft.isLoading = false;
+                draft.total = action.payload.total;
+            });
+        case "LOAD_MORE_EXPENSES":
+            return produce(state, draft => {
                 action.payload.forEach(expense =>
                     draft.expenses.push(expense)
                 );
-                draft.isLoading = false
             });
         case "UPDATE_EXPENSE_COMMENT":
             return produce(state, draft => {
