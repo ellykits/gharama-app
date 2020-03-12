@@ -146,10 +146,12 @@ class ExpenseList extends Component<Props, State> {
 
     private renderFooter() {
         const {isFetchingData, total, offset, limit} = this.state;
-        if ((offset + limit) < total) {
-            return (
-                <View style={styles.footer}>
-                    <Text style={styles.counter}>{offset + limit} of {total} expenses</Text>
+        let withinBound = ((offset + limit) - total) <= 0;
+        return (
+            <View style={styles.footer}>
+                <Text
+                    style={styles.counter}>1 - {!withinBound ? (offset + (total - offset)) : offset + limit} of {total} expenses</Text>
+                {withinBound ? (
                     <TouchableOpacity
                         activeOpacity={0.9}
                         onPress={this.loadMoreExpenses}
@@ -158,12 +160,10 @@ class ExpenseList extends Component<Props, State> {
                         {isFetchingData ? (
                             <ActivityIndicator color="#F06292" style={{marginLeft: 8}}/>
                         ) : null}
-                    </TouchableOpacity>
-                </View>
-            );
-        } else {
-            return null;
-        }
+                    </TouchableOpacity>) : null
+                }
+            </View>
+        );
     }
 
     private static onPress(item: Expense) {
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
         color: '#696969',
     },
     loadMoreBtn: {
-        flex:1,
+        flex: 1,
         padding: 10,
         borderColor: '#F06292',
         borderRadius: 4,
