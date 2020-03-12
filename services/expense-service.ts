@@ -1,16 +1,25 @@
 import {store} from "../store";
-import {saveExpensesAction, updateExpenseCommentAction, updateExpenseReceipt} from "../actions/expense-actions";
+import {
+    loadMoreExpenses,
+    saveExpensesAction,
+    updateExpenseCommentAction,
+    updateExpenseReceipt
+} from "../actions/expense-actions";
 import {Expense} from "../common/common-types";
 import moment from "moment";
+
+export interface ExpenseResponse {
+    expenses: Expense []
+    total: number
+}
 
 export default class ExpenseService {
 
     private URL = 'http://10.0.2.2:3000/expenses';
 
-    async fetchExpenses(): Promise<Expense[]> {
-        return await fetch(this.URL, {method: 'GET'})
+    async fetchExpenses(offset: number, limit: number): Promise<ExpenseResponse> {
+        return await fetch(`${this.URL}?limit=${limit}&offset=${offset}`, {method: 'GET'})
             .then(response => response.json())
-            .then(result => result.expenses)
     }
 
     uploadReceipt(filePath: string, id: string, uploadReceiptCallback: (expense: Expense | null) => void) {
@@ -37,8 +46,8 @@ export default class ExpenseService {
             });
     }
 
-    dispatchSaveExpenses(expenses: Expense[]) {
-        store.dispatch(saveExpensesAction(expenses))
+    dispatchSaveExpenses(expenses: Expense[], total: number) {
+        store.dispatch(saveExpensesAction(expenses, total))
     }
 
     dispatchUpdateExpenseComment(id: string, comment: string) {
@@ -47,5 +56,9 @@ export default class ExpenseService {
 
     dispatchUpdateExpenseReceipt(expense: Expense) {
         store.dispatch(updateExpenseReceipt(expense))
+    }
+
+    dispatchLoadMoreExpenses(expenses: Expense[]) {
+        store.dispatch(loadMoreExpenses(expenses))
     }
 }

@@ -20,11 +20,16 @@ import moment from "moment";
 interface Props {
     componentId: string;
     expenses: Expense[]
+    total: number
     isLoading: boolean
 }
 
 interface State {
     filteredExpenses: Expense []
+    offset: number
+    limit: number
+    isFetchingData: boolean
+    total: number
 }
 
 class ExpenseList extends Component<Props, State> {
@@ -33,15 +38,19 @@ class ExpenseList extends Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.state = {filteredExpenses: this.props.expenses}
+        this.state = {
+            filteredExpenses: this.props.expenses,
+            offset: 0,
+            limit: 30,
+            isFetchingData: false,
+            total: this.props.total
+        }
     }
 
     componentDidMount(): void {
-        this.expenseService.fetchExpenses()
-            .then(expenses => {
-                this.expenseService.dispatchSaveExpenses(expenses);
-                this.setState({filteredExpenses: expenses})
-            }).catch(error => console.log(error));
+
+        let {limit, offset} = this.state;
+        this.retrieveExpenses(offset, limit, false);
 
         const eventEmitter = new NativeEventEmitter(NativeModules.ExpenseDetailsModule);
         eventEmitter.addListener('UploadImageEvent', (event) => {
@@ -59,6 +68,35 @@ class ExpenseList extends Component<Props, State> {
             this.expenseService.dispatchUpdateExpenseComment(event.id, event.comment);
         });
     }
+
+    private retrieveExpenses(offset: number, limit: number, loadMore: boolean) {
+        this.expenseService.fetchExpenses(offset, limit)
+            .then(expenseResponse => {
+                if (loadMore) {
+                    this.expenseService.dispatchLoadMoreExpenses(expenseResponse.expenses);
+                    this.setState({
+                        total: expenseResponse.total,
+                        filteredExpenses: [...this.state.filteredExpenses, ...expenseResponse.expenses],
+                        isFetchingData: false
+                    })
+                } else {
+                    this.expenseService.dispatchSaveExpenses(expenseResponse.expenses, expenseResponse.total);
+                    this.setState({total: expenseResponse.total, filteredExpenses: expenseResponse.expenses})
+                }
+            }).catch(error => console.log(error));
+    }
+
+    private loadMoreExpenses = () => {
+        this.setState({isFetchingData: true}, () => {
+            const {limit, offset, total} = this.state;
+            let newOffset = offset + limit;
+            this.setState({offset: newOffset}, () => {
+                if (newOffset < total) {
+                    this.retrieveExpenses(this.state.offset, this.state.limit, true);
+                }
+            })
+        });
+    };
 
     static get options() {
         return {
@@ -106,8 +144,34 @@ class ExpenseList extends Component<Props, State> {
         );
     }
 
+    private renderFooter() {
+        const {isFetchingData, total, offset, limit} = this.state;
+        if ((offset + limit) < total) {
+            return (
+                <View style={styles.footer}>
+                    <Text style={styles.counter}>{offset + limit} of {total} expenses</Text>
+                    <TouchableOpacity
+                        activeOpacity={0.9}
+                        onPress={this.loadMoreExpenses}
+                        style={styles.loadMoreBtn}>
+                        <Text style={styles.btnText}>Load more expenses</Text>
+                        {isFetchingData ? (
+                            <ActivityIndicator color="#F06292" style={{marginLeft: 8}}/>
+                        ) : null}
+                    </TouchableOpacity>
+                </View>
+            );
+        } else {
+            return null;
+        }
+    }
+
     private static onPress(item: Expense) {
         NativeModules.ExpenseDetailsModule.displayExpenseDetails(item);
+    }
+
+    private static getMatch(firstString: string, secondString: string) {
+        return firstString.toLowerCase().trim().match(secondString.trim().toLowerCase());
     }
 
     private filterExpenses = (text: string) => {
@@ -118,16 +182,11 @@ class ExpenseList extends Component<Props, State> {
         this.setState({filteredExpenses: currentExpenses});
     };
 
-
-    private static getMatch(firstString: string, secondString: string) {
-        return firstString.toLowerCase().trim().match(secondString.trim().toLowerCase());
-    }
-
     render() {
         if (this.props.isLoading) {
             return (
                 <View style={styles.loader}>
-                    <ActivityIndicator size="large" color="#0c9"/>
+                    <ActivityIndicator size="large" color="#F06292"/>
                 </View>
             );
         }
@@ -145,6 +204,7 @@ class ExpenseList extends Component<Props, State> {
                     data={this.state.filteredExpenses}
                     renderItem={data => this.bindItem(data.item)}
                     keyExtractor={item => item.id.toString()}
+                    ListFooterComponent={this.renderFooter.bind(this)}
                 />
             </View>
         );
@@ -210,11 +270,39 @@ const styles = StyleSheet.create({
     searchWrapper: {
         backgroundColor: '#F3F4F5',
     },
+    footer: {
+        padding: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'column',
+    },
+    counter: {
+        flex: 1,
+        padding: 8,
+        color: '#696969',
+    },
+    loadMoreBtn: {
+        flex:1,
+        padding: 10,
+        borderColor: '#F06292',
+        borderRadius: 4,
+        borderWidth: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    btnText: {
+        color: '#F06292',
+        fontSize: 16,
+        textAlign: 'center',
+    },
+
 });
 
 
 const mapStateToProps = (appState: AppState) => {
-    return {expenses: appState.expenseState.expenses, isLoading: appState.expenseState.isLoading}
+    const {expenses, isLoading, total} = appState.expenseState;
+    return {expenses: expenses, isLoading: isLoading, total: total}
 };
 
 export default connect(mapStateToProps)(ExpenseList)
