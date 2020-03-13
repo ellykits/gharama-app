@@ -10,9 +10,6 @@ jobs:
           at: .
       - rn/yarn_install
       - run:
-          command: yarn flow
-          name: Flow
-      - run:
           command: yarn jest
           name: Jest
   checkout_code:
