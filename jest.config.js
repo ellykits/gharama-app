@@ -24,4 +24,16 @@ module.exports = {
         "./__mocks__/react-native.ts",
         "./jest-setup.js"
     ],
+    collectCoverageFrom: [
+        "**/*.{ts,tsx}",
+        "!**/node_modules/**",
+        "!**/vendor/**",
+        "!**/__mocks__/**",
+        "!**/__snapshots__/**",
+        "!**/android/**",
+        "!**/ios/**",
+        "!**/config/**",
+        "!**/build/**",
+        "!**/lib/**",
+    ]
 };
