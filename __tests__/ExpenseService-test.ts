@@ -83,3 +83,7 @@ it('fetches expenses from the endpoint', () => {
             expect(onResponse.mock.calls[0][0][0]).toEqual(expenses[0]);
         });
 });
+
+it('uploads receipts to the server', () => {
+    expenseService.uploadReceipt()
+});
