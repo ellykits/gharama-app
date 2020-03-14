@@ -12,7 +12,7 @@ Note:
 - User can add a comment on an expense  
 - User can filter on expenses (client side filters)  
 - User can add a receipt image on an expense  
-  <p><img src ="./pics/welcome.png" width="360" /><img src ="./pics/demo.gif" width="360" /></p>  
+  <p><img src ="./pics/welcome.png" width="360" />  <img src ="./pics/demo.gif" width="360" /></p>  
   
 ## Setting up the project  
   
