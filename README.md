@@ -1,6 +1,6 @@
 
 # Gharama App 
-[![Build Status](https://travis-ci.org/ellykits/gharama-app.svg?branch=master)](https://travis-ci.com/github/ellykits/gharama-app) 
+![](https://github.com/ellykits/gharama-app/workflows/Build%20Android/badge.svg)
 
 Gharama (Swahili word meaning *expenses*) app is an expense listing react native Android app. This app fetches expenses from the provided API and allows users to add notes and upload receipt pictures to each expense.  
   
