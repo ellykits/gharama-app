@@ -22,6 +22,9 @@ jobs:
       - name: Install npm dependencies
         run: |
           yarn install
+      - name: Create local.properties file
+        run: |
+          printf 'expenses.base.url="http://10.0.2.2:3000/"' >> $HOME/work/gharama-app/gharama-app/android/local.properties
       - name: Run Android tests
         run: |
           cd android && ./gradlew clean && ./gradlew cleanBuildCache && ./gradlew app:test --stacktrace
